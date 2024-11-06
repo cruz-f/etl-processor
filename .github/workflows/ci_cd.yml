@@ -1,0 +1,219 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - main
+      - feat/ci-cd # TODO: remove this line
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  lint_typecheck:
+    name: lint & type checking ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.13"
+
+    steps:
+      #----------------------------------------------
+      #  checkout the repository
+      #----------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      #----------------------------------------------
+      #  install & configure poetry
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      #----------------------------------------------
+      #  load cached venv if cache exists
+      #----------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      #----------------------------------------------
+      #  install project and dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install project and dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction
+
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files --verbose
+        env:
+          SKIP: no-commit-to-branch
+
+  test:
+    name: tests on ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.13"
+
+    steps:
+      #----------------------------------------------
+      #  checkout the repository
+      #----------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      #----------------------------------------------
+      #  install & configure poetry
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      #----------------------------------------------
+      #  load cached venv if cache exists
+      #----------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      #----------------------------------------------
+      #  install project and dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install project and dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction
+
+      #----------------------------------------------
+      #  run tests
+      #----------------------------------------------
+      - name: Run tests
+        run: |
+          mkdir coverage
+          poetry run coverage run -m pytest tests
+          poetry run coverage combine coverage
+          poetry run coverage report
+          poetry run coverage html --show-contexts --title "etl processor coverage for ${{ github.sha }}"
+
+      #----------------------------------------------
+      #  store coverage data
+      #----------------------------------------------
+      - name: Store coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data
+          path: .coverage
+          include-hidden-files: true
+
+      #----------------------------------------------
+      #  store coverage report
+      #----------------------------------------------
+      - name: Store coverage html
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
+
+  release:
+    needs: [lint_typecheck, test]
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.13"
+
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+
+      # write permission is required for autolabeler
+      pull-requests: write
+
+    steps:
+      #----------------------------------------------
+      #  checkout the repository
+      #----------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      #----------------------------------------------
+      #  install & configure poetry
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      #----------------------------------------------
+      #  Build the package
+      #----------------------------------------------
+      - name: Build and publish the package
+        run: poetry build
+
+      #----------------------------------------------
+      #  Draft a new release
+      #----------------------------------------------
+      - name: Draft a new release
+        id: draft_release
+        uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #----------------------------------------------
+      #  Upload the package to the release
+      #----------------------------------------------
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.draft_release.outputs.upload_url }}
+          asset_path: ./dist/*
+          asset_name: etl-processor-${{ github.sha }}.tar.gz
+          asset_content_type: application/gzip
