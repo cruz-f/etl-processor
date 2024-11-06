@@ -25,7 +25,11 @@ repos:
       - id: ruff-format
         types_or: [python, pyi]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+  - repo: local
     hooks:
-      - id: mypy
+    - id: lint
+      name: Lint
+      entry: poetry run mypy --config-file pyproject.toml .
+      types: [python]
+      language: system
+      pass_filenames: false

@@ -26,6 +26,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers"]
 xfail_strict = true
+markers = ["chore: internal and/or infrastructural changes"]
 
 [tool.coverage.run]
 parallel = true
@@ -42,8 +43,7 @@ show_contexts = true
 
 [tool.mypy]
 strict = true
-mypy_path = "stubs"
-files = ["**/*.py"]
+exclude = ["tests"]
 
 [tool.ruff]
 line-length = 120
