@@ -17,7 +17,47 @@ pytest = "^8.3.3"
 mypy = "^1.13.0"
 ruff = "^0.7.2"
 coverage = "^7.6.4"
+pre-commit = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+strict = true
+mypy_path = "stubs"
+files = ["**/*.py"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "F",      # Pyflakes
+    "E",      # pycodestyle (Error)
+    "I",      # isort
+    "D",      # pydocstyle
+    "UP",     # pyupgrade
+    "YTT",    # flake8-2020
+    "B",      # flake8-bugbear
+    "T10",    # flake8-debugger
+    "T20",    # flake8-print
+    "C4",     # flake8-comprehensions
+    "PYI006", # flake8-pyi
+]
+ignore = ["D105", "D107", "D205", "D415", "E501", "B011", "B028", "B904"]
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+isort = { known-first-party = ["etl_processor", "tests"] }
+mccabe = { max-complexity = 14 }
+pydocstyle = { convention = "google" }
+
+[tool.ruff.lint.per-file-ignores]
+"etl_processor/__init__.py" = ["F405", "F403", "D"]
+"tests/*" = ["D", "B", "C4"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = ["T", "E721", "F811"]
+
+[tool.ruff.format]
+quote-style = "single"
