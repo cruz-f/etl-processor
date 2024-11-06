@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "etl-processor"
+version = "0.1.0"
+description = "A sample project for a Python-based ETL tool"
+authors = ["fernandocruz184 <fernandocruz184@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "etl_processor" }]
+package-mode = true
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pandas = "^2.2.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.13.0"
+ruff = "^0.7.2"
+coverage = "^7.6.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
