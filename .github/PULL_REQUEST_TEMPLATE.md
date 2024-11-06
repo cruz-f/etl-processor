@@ -1,13 +1,6 @@
 # Summary
 
-It adds infrastructure and Python package skeletons as follows:
-
-- Poetry-based dependency management
-- Python package structure
-- Linting and formatting using ruff
-- Type checking using mypy
-- Pytest test framework
-- Code coverage using coverage.py
+_Briefly describe the changes in this pull request._
 
 # Checklist
 
