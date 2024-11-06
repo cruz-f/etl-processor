@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/ci-cd # TODO: remove this line
   pull_request:
     types:
       - opened
@@ -151,7 +150,7 @@ jobs:
 
   release:
     needs: [lint_typecheck, test]
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -191,12 +190,6 @@ jobs:
           virtualenvs-in-project: true
 
       #----------------------------------------------
-      #  Build the package
-      #----------------------------------------------
-      - name: Build and publish the package
-        run: poetry build
-
-      #----------------------------------------------
       #  Draft a new release
       #----------------------------------------------
       - name: Draft a new release
@@ -204,6 +197,14 @@ jobs:
         uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #----------------------------------------------
+      #  Build the package
+      #----------------------------------------------
+      - name: Build the package
+        run: |
+          poetry build
+          zip -r --junk-paths etl-processor-${{ steps.draft_release.outputs.tag_name }}.zip dist
 
       #----------------------------------------------
       #  Upload the package to the release
@@ -214,6 +215,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.draft_release.outputs.upload_url }}
-          asset_path: ./dist/*
-          asset_name: etl-processor-${{ github.sha }}.tar.gz
-          asset_content_type: application/gzip
+          asset_path: ./etl-processor-${{ steps.draft_release.outputs.tag_name }}.zip
+          asset_name: etl-processor-${{ steps.draft_release.outputs.tag_name }}.zip
+          asset_content_type: application/zip
