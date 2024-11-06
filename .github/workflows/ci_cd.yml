@@ -27,6 +27,15 @@ jobs:
         uses: actions/checkout@v4
 
       #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      #----------------------------------------------
       #  install & configure poetry
       #----------------------------------------------
       - name: Install Poetry
@@ -74,6 +83,15 @@ jobs:
       #----------------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
+
+      #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       #----------------------------------------------
       #  install & configure poetry
@@ -153,6 +171,15 @@ jobs:
       #----------------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
+
+      #----------------------------------------------
+      #  Set up Python
+      #----------------------------------------------
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       #----------------------------------------------
       #  install & configure poetry
