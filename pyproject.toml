@@ -23,6 +23,23 @@ pre-commit = "^4.0.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers"]
+xfail_strict = true
+
+[tool.coverage.run]
+parallel = true
+data_file = "coverage/.coverage"
+source = ["etl_processor"]
+
+[tool.coverage.report]
+show_missing = true
+sort = "-Cover"
+exclude_lines = ["if TYPE_CHECKING:", "if typing.TYPE_CHECKING:"]
+
+[tool.coverage.html]
+show_contexts = true
+
 [tool.mypy]
 strict = true
 mypy_path = "stubs"
