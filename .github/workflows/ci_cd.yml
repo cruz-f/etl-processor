@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/ci-cd # TODO: remove this line
   pull_request:
     types:
       - opened
@@ -151,7 +150,7 @@ jobs:
 
   release:
     needs: [lint_typecheck, test]
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     strategy:
       matrix:
