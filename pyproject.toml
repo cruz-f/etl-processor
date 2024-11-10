@@ -11,6 +11,7 @@ package-mode = true
 [tool.poetry.dependencies]
 python = "^3.13"
 pandas = "^2.2.3"
+pydantic = "^2.9.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
