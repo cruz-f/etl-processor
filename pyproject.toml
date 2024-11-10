@@ -12,6 +12,9 @@ package-mode = true
 python = "^3.13"
 pandas = "^2.2.3"
 pydantic = "^2.9.2"
+httpx = "^0.27.2"
+tqdm = "^4.67.0"
+types-tqdm = "^4.66.0.20240417"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
