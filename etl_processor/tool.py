@@ -6,12 +6,9 @@ An ETL tool is a class that implements the following methods:
 """
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
-
-T = TypeVar('T')
 
 
-class Tool(ABC, Generic[T]):
+class Tool(ABC):
     """
     A ETL tool implements all the necessary routines and methods to either extract, transform or load data.
 
@@ -20,14 +17,21 @@ class Tool(ABC, Generic[T]):
     """
 
     @abstractmethod
-    def run(self) -> T:
+    def run(self) -> None:
         """
         Implement the main logic of the tool to either extract, transform or load data.
 
-        Returns
-        -------
-        T
-            The result of the tool execution.
+        Raises
+        ------
+        ETLException
+            If an error occurs during the execution of the tool.
+        """
+        pass
+
+    @abstractmethod
+    async def arun(self) -> None:
+        """
+        Implement the main logic of the tool to either extract, transform or load data asynchronously.
 
         Raises
         ------
