@@ -43,13 +43,13 @@ def test_create_firds(firds: dict[str, str]) -> None:
     assert firds_model.id == firds['Id']
     assert firds_model.full_name == firds['FullNm']
     assert firds_model.instrument_type == firds['ClssfctnTp']
-    
+
     if firds['CmmdtyDerivInd'].lower() == 'true':
         firds_commodity_derivative_indicator = True
     else:
         firds_commodity_derivative_indicator = False
     assert firds_model.commodity_derivative_indicator == firds_commodity_derivative_indicator
-    
+
     assert firds_model.notional_currency == firds['NtnlCcy']
     assert firds_model.issuer == firds['Issr']
 
