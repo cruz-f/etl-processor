@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from etl_processor.exceptions import NetworkError
 from etl_processor.exceptions import ValidationError as ETLValidationError
+from etl_processor.logger import logger
 from etl_processor.models import FIRDS, FIRDSDoc
 from etl_processor.tool import Tool
 
@@ -68,12 +69,14 @@ class FIRDSExtractor(Tool):
     def _fetch_and_parse_firds_ref_doc(self) -> list[FIRDSDoc]:
         # get the firds reference doc from the firds_url
         try:
-            # TODO: log the request
+            logger.info(f'Fetching the FIRDS reference document from {self.firds_url}')
+
             firds_ref_doc_response = httpx.get(self.firds_url)
             firds_ref_doc_response.raise_for_status()
 
         except httpx.HTTPError as exc:
-            # TODO: log the error
+            logger.error(f'Error fetching the FIRDS reference document from {self.firds_url}')
+            logger.error(str(exc))
             raise NetworkError('Error fetching the FIRDS reference document.') from exc
 
         # iterate over the list of docs to get the firds zip
@@ -91,12 +94,12 @@ class FIRDSExtractor(Tool):
                 ref_doc = FIRDSDoc.model_validate(ref_doc_dict)
 
             except ValidationError as exc:
-                # TODO: log the error
+                logger.error(f'Error validating the FIRDS reference document: {ref_doc_dict}')
                 raise ETLValidationError(str(exc)) from exc
 
             firds_ref_docs.append(ref_doc)
 
-        # TODO: log the parsed firds reference doc
+        logger.info(f'Fetched {len(firds_ref_docs)} FIRDS reference documents from {self.firds_url}')
         return firds_ref_docs
 
     def _parse_firds_xml_file(self, firds_xml: IO[bytes]) -> None:
@@ -125,8 +128,10 @@ class FIRDSExtractor(Tool):
                 try:
                     firds = FIRDS.model_validate(firds_dict)
 
-                except ValidationError:
-                    # TODO: log the error
+                except ValidationError as exc:
+                    # log the error and continue
+                    logger.error(f'Error validating the FIRDS document: {firds_dict}')
+                    logger.error(str(exc))
                     continue
 
                 firds_validated_dict = firds.model_dump(by_alias=True)
@@ -156,14 +161,16 @@ class FIRDSExtractor(Tool):
         # download the firds zip files
         for firds_ref_doc in firds_ref_docs:
             try:
-                # TODO: log the request
+                # log the request
+                logger.info(f'Fetching the FIRDS zip file from {firds_ref_doc.download_link}')
 
                 # fetch the firds zip file
                 firds_zip_response = httpx.get(firds_ref_doc.download_link)
                 firds_zip_response.raise_for_status()
 
             except httpx.HTTPError as exc:
-                # TODO: log the error
+                logger.error(f'Error fetching the FIRDS zip file from {firds_ref_doc.download_link}')
+
                 raise NetworkError('Error fetching the FIRDS zip file.') from exc
 
             # parse the firds zip file
@@ -176,14 +183,14 @@ class FIRDSExtractor(Tool):
         async with httpx.AsyncClient() as client:
             for firds_ref_doc in tqdm(firds_ref_docs):
                 try:
-                    # TODO: log the request
+                    logger.info(f'Fetching the FIRDS zip file from {firds_ref_doc.download_link}')
 
                     # fetch the firds zip file
                     firds_zip_response = await client.get(firds_ref_doc.download_link)
                     firds_zip_response.raise_for_status()
 
                 except httpx.HTTPError as exc:
-                    # TODO: log the error
+                    logger.error(f'Error fetching the FIRDS zip file from {firds_ref_doc.download_link}')
                     raise NetworkError('Error fetching the FIRDS zip file.') from exc
 
                 # parse the firds zip file
@@ -202,6 +209,8 @@ class FIRDSExtractor(Tool):
         ValidationError
             If an error occurs during the validation of the FIRDS document.
         """
+        logger.info(f'Extracting data from the FIRDS database at {self.firds_url}')
+
         # get the firds reference docs
         firds_ref_docs = self._fetch_and_parse_firds_ref_doc()
 
@@ -214,6 +223,7 @@ class FIRDSExtractor(Tool):
         # fetch the firds zip files
         await self._afetch_and_parse_firds_files(firds_ref_docs)
 
+        logger.info(f'Extracted data from the FIRDS database at {self.firds_url}')
         return
 
     def run(self) -> None:
@@ -225,6 +235,8 @@ class FIRDSExtractor(Tool):
         NetworkError
             If an error occurs during the extraction of the FIRDS document.
         """
+        logger.info(f'Extracting data from the FIRDS database at {self.firds_url}')
+
         # get the firds reference docs
         firds_ref_docs = self._fetch_and_parse_firds_ref_doc()
 
@@ -237,6 +249,7 @@ class FIRDSExtractor(Tool):
         # fetch the firds zip files
         self._fetch_and_parse_firds_files(firds_ref_docs)
 
+        logger.info(f'Extracted data from the FIRDS database at {self.firds_url}')
         return
 
 
