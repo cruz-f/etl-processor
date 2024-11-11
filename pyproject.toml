@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "etl-processor"
-version = "0.1.0"
+version = "0.1.3"
 description = "A sample project for a Python-based ETL tool"
 authors = ["fernandocruz184 <fernandocruz184@gmail.com>"]
 license = "MIT"
