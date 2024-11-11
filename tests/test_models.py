@@ -35,41 +35,41 @@ def test_create_firds_doc_invalid_data(firds_doc_data: dict[str, str]) -> None:
         FIRDSDoc.model_validate(firds_doc_data)
 
 
-def test_create_firds(firds: dict[str, str]) -> None:
+def test_create_firds(firds_data: dict[str, str]) -> None:
     """
     Test create FIRDS.
     """
-    firds_model = FIRDS.model_validate(firds)
-    assert firds_model.id == firds['Id']
-    assert firds_model.full_name == firds['FullNm']
-    assert firds_model.instrument_type == firds['ClssfctnTp']
+    firds_model = FIRDS.model_validate(firds_data)
+    assert firds_model.id == firds_data['Id']
+    assert firds_model.full_name == firds_data['FullNm']
+    assert firds_model.instrument_type == firds_data['ClssfctnTp']
 
-    if firds['CmmdtyDerivInd'].lower() == 'true':
+    if firds_data['CmmdtyDerivInd'].lower() == 'true':
         firds_commodity_derivative_indicator = True
     else:
         firds_commodity_derivative_indicator = False
     assert firds_model.commodity_derivative_indicator == firds_commodity_derivative_indicator
 
-    assert firds_model.notional_currency == firds['NtnlCcy']
-    assert firds_model.issuer == firds['Issr']
+    assert firds_model.notional_currency == firds_data['NtnlCcy']
+    assert firds_model.issuer == firds_data['Issr']
 
 
-def test_create_firds_missing_fields(firds: dict[str, str]) -> None:
+def test_create_firds_missing_fields(firds_data: dict[str, str]) -> None:
     """
     Test fail to create FIRDS with missing fields.
     """
-    firds.pop('Id')
+    firds_data.pop('Id')
     with pytest.raises(ValidationError):
-        FIRDS.model_validate(firds)
+        FIRDS.model_validate(firds_data)
 
 
-def test_create_firds_invalid_data(firds: dict[str, str]) -> None:
+def test_create_firds_invalid_data(firds_data: dict[str, str]) -> None:
     """
     Test fail to create FIRDS with invalid data.
     """
-    firds['CmmdtyDerivInd'] = 'abc'
+    firds_data['CmmdtyDerivInd'] = 'abc'
     with pytest.raises(ValidationError):
-        FIRDS.model_validate(firds)
+        FIRDS.model_validate(firds_data)
 
 
 def test_firds_csv_header() -> None:
