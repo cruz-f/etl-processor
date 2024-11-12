@@ -7,6 +7,7 @@ import fsspec  # type: ignore
 import pandas as pd
 
 from etl_processor.exceptions import LoadError
+from etl_processor.logger import logger
 from etl_processor.tool import Tool
 
 
@@ -84,14 +85,20 @@ class FIRDSLoader(Tool):
             If an error occurs during the loading of the FIRDS data.
         """
         try:
+            logger.info(f'Loading the FIRDS data in {self.firds_csv_path} to {self.target_path}')
+
             # read the firds csv file
+            # TODO: read the csv file adds an extra validation step. It verifies the file is a valid csv file. However, it might not be necessary. We could well load the file directly to the file storage system.
             df = pd.read_csv(self.firds_csv_path)
 
             # write the dataframe to the file storage system
             with self.fs.open(self.target_path, 'wb') as f:
                 df.to_csv(f, index=False)
 
+            logger.info(f'The FIRDS data has been loaded to {self.target_path}')
+
         except Exception as exc:
+            logger.error(f'Error loading the FIRDS data to {self.target_path}')
             raise LoadError('Error loading the FIRDS data.') from exc
 
         return
@@ -107,6 +114,7 @@ class FIRDSLoader(Tool):
         LoadError
             If an error occurs during the loading of the FIRDS data.
         """
+        # TODO: consider using the async version of fsspec to write the csv file
         self.run()
         return
 
