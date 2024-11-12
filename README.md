@@ -65,7 +65,32 @@ Example output:
 
 ### 2. Transform
 
-TBD
+Transformation tool to obtain new insights from the financial instruments in the financial instrument reference data system (FIRDS).
+
+Asynchronous transformation:
+
+```python
+import asyncio
+from etl_processor import FIRDSTransformer
+
+transformer = FIRDSTransformer(
+    data_dir='data',
+)
+async def main() -> None:
+    await transformer.arun()
+asyncio.run(main())
+```
+
+Synchronous transformation:
+
+```python
+from etl_processor import FIRDSTransformer
+
+transformer = FIRDSTransformer(
+    data_dir='data',
+)
+transformer.run()
+```
 
 ### 3. Load
 
