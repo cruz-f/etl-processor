@@ -133,6 +133,10 @@ loader = FIRDSLoader(
 loader.run()
 ```
 
+## Examples
+
+Check the [examples](examples) folder for fully working juptyer notebooks with examples of the ETL process.
+
 ## Development
 
 ### 1. Install dependencies
