@@ -119,3 +119,21 @@ DE000A1R07V3,Kreditanst.f.Wiederaufbau Anl.v.2014 (2021),DBFTFB,False,EUR,549300
     firds_csv_path = tmp_path_factory.mktemp('data') / 'firds.csv'
     firds_csv_path.write_text(firds_csv_data)
     return firds_csv_path
+
+
+@pytest.fixture(scope='session')
+def firds_transformed_csv(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """
+    Fixture of a transformed FIRDS CSV document.
+    It creates a temporary file mocking the transformed FIRDS CSV data.
+    """
+    firds_transformed_csv_data = """
+FinInstrmGnlAttrbts.Id,FinInstrmGnlAttrbts.FullNm,FinInstrmGnlAttrbts.ClssfctnTp,FinInstrmGnlAttrbts.CmmdtyDerivInd,FinInstrmGnlAttrbts.NtnlCcy,Issr,a_count,contains_a
+DE000A1R07V3,Kreditanst.f.Wiederaufbau     Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98,4,True
+DE000A1R07V3,KFW 1 5/8 01/15/21,DBFTFB,False,EUR,549300GDPG70E3MBBU98,0,False
+DE000A1R07V3,Kreditanst.f.Wiederaufbau Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98,4,True
+DE000A1R07V3,Kreditanst.f.Wiederaufbau Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98,4,True
+"""
+    firds_transformed_csv_path = tmp_path_factory.mktemp('data') / 'firds_transformed.csv'
+    firds_transformed_csv_path.write_text(firds_transformed_csv_data)
+    return firds_transformed_csv_path

@@ -94,7 +94,44 @@ transformer.run()
 
 ### 3. Load
 
-TBD
+Loading tool to save the FIRDS CSV into a file storage system.
+
+Asynchronous loading:
+
+```python
+import asyncio
+from etl_processor import FIRDSLoader
+
+storage_options = {
+    'anon': False,
+}
+loader = FIRDSLoader(
+    data_dir='data',
+    system='s3',
+    target_path='s3://my-bucket/firds_gold.csv',
+    storage_options=storage_options,
+)
+async def main() -> None:
+    await loader.arun()
+asyncio.run(main())
+```
+
+Synchronous loading:
+
+```python
+from etl_processor import FIRDSLoader
+
+storage_options = {
+    'anon': False,
+}
+loader = FIRDSLoader(
+    data_dir='data',
+    system='s3',
+    target_path='s3://my-bucket/firds_gold.csv',
+    storage_options=storage_options,
+)
+loader.run()
+```
 
 ## Development
 
