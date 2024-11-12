@@ -34,6 +34,7 @@ xfail_strict = true
 markers = [
     "chore: internal and/or infrastructural changes",
     "extract: tests for the extract tool",
+    "transform: tests for the transform tool",
 ]
 
 [tool.coverage.run]
