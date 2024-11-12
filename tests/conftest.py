@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -100,3 +101,21 @@ def firds_xml_data() -> str:
     return """
 <BizData xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:head.003.001.01 head.003.001.01.xsd" xmlns="urn:iso:std:iso:20022:tech:xsd:head.003.001.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><Hdr><AppHdr xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:head.001.001.01 head.001.001.01_ESMAUG_1.0.0.xsd" xmlns="urn:iso:std:iso:20022:tech:xsd:head.001.001.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><Fr><OrgId><Id><OrgId><Othr><Id>EU</Id></Othr></OrgId></Id></OrgId></Fr><To><OrgId><Id><OrgId><Othr><Id>Public</Id></Othr></OrgId></Id></OrgId></To><BizMsgIdr>DLTINS_20210118_01of01</BizMsgIdr><MsgDefIdr>auth.036.001.02</MsgDefIdr><CreDt>2021-01-18T01:21:23.773Z</CreDt></AppHdr></Hdr><Pyld><Document xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:auth.036.001.02 auth.036.001.02_ESMAUG_DLTINS_1.1.0.xsd" xmlns="urn:iso:std:iso:20022:tech:xsd:auth.036.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FinInstrmRptgRefDataDltaRpt><RptHdr><RptgNtty><NtlCmptntAuthrty>EU</NtlCmptntAuthrty></RptgNtty><RptgPrd><Dt>2021-01-18</Dt></RptgPrd></RptHdr><FinInstrm><TermntdRcrd><FinInstrmGnlAttrbts><Id>EZV1JDJ1R5Q9</Id><FullNm>Foreign_Exchange Forward JPY SEK 20210116</FullNm><ClssfctnTp>JFTXFP</ClssfctnTp><NtnlCcy>SEK</NtnlCcy><CmmdtyDerivInd>false</CmmdtyDerivInd></FinInstrmGnlAttrbts><Issr>2138004TYNQCB7MLTG76</Issr><TradgVnRltdAttrbts><Id>EBSF</Id><IssrReq>true</IssrReq><AdmssnApprvlDtByIssr>2018-01-30T00:23:09.561Z</AdmssnApprvlDtByIssr><ReqForAdmssnDt>2018-01-30T00:23:09.705Z</ReqForAdmssnDt><FrstTradDt>2018-01-30T00:23:09.705Z</FrstTradDt><TermntnDt>2021-01-16T23:59:59.999Z</TermntnDt></TradgVnRltdAttrbts><DerivInstrmAttrbts><XpryDt>2021-01-16</XpryDt><PricMltplr>1</PricMltplr><DlvryTp>PHYS</DlvryTp><AsstClssSpcfcAttrbts><FX><FxTp>FXMJ</FxTp><OthrNtnlCcy>JPY</OthrNtnlCcy></FX></AsstClssSpcfcAttrbts></DerivInstrmAttrbts><TechAttrbts><RlvntCmptntAuthrty>NL</RlvntCmptntAuthrty><PblctnPrd><FrDtToDt><FrDt>2021-01-03</FrDt><ToDt>2021-01-17</ToDt></FrDtToDt></PblctnPrd><RlvntTradgVn>EBSF</RlvntTradgVn></TechAttrbts></TermntdRcrd></FinInstrm></FinInstrmRptgRefDataDltaRpt></Document></Pyld></BizData>
 """
+
+
+@pytest.fixture(scope='session')
+def firds_csv(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """
+    Fixture of a FIRDS CSV document.
+    It creates a temporary file mocking the FIRDS CSV data.
+    """
+    firds_csv_data = """
+FinInstrmGnlAttrbts.Id,FinInstrmGnlAttrbts.FullNm,FinInstrmGnlAttrbts.ClssfctnTp,FinInstrmGnlAttrbts.CmmdtyDerivInd,FinInstrmGnlAttrbts.NtnlCcy,Issr
+DE000A1R07V3,Kreditanst.f.Wiederaufbau     Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98
+DE000A1R07V3,KFW 1 5/8 01/15/21,DBFTFB,False,EUR,549300GDPG70E3MBBU98
+DE000A1R07V3,Kreditanst.f.Wiederaufbau Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98
+DE000A1R07V3,Kreditanst.f.Wiederaufbau Anl.v.2014 (2021),DBFTFB,False,EUR,549300GDPG70E3MBBU98
+"""
+    firds_csv_path = tmp_path_factory.mktemp('data') / 'firds.csv'
+    firds_csv_path.write_text(firds_csv_data)
+    return firds_csv_path
