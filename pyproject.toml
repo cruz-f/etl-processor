@@ -16,6 +16,7 @@ httpx = "^0.27.2"
 tqdm = "^4.67.0"
 types-tqdm = "^4.66.0.20240417"
 pandas-stubs = "^2.2.3.241009"
+fsspec = "^2024.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -36,6 +37,8 @@ markers = [
     "chore: internal and/or infrastructural changes",
     "extract: tests for the extract tool",
     "transform: tests for the transform tool",
+    "load: tests for the load tool",
+    "e2e: end-to-end tests",
 ]
 
 [tool.coverage.run]
