@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from etl_processor.exceptions import TransformationError
+from etl_processor.logger import logger
 from etl_processor.tool import Tool
 
 
@@ -79,6 +80,8 @@ class FIRDSTransformer(Tool):
             raise TransformationError(f'The FIRDS CSV file {self.firds_csv_path} does not exist.')
 
         try:
+            logger.info(f'Transforming the FIRDS data in the file {self.firds_csv_path}')
+
             # process the firds csv file in chunks
             transformed_csv_path = self.data_dir / 'firds_transformed.csv'
             first_chunk = True
@@ -99,7 +102,10 @@ class FIRDSTransformer(Tool):
 
                     first_chunk = False
 
+            logger.info(f'The transformed FIRDS data is saved to {transformed_csv_path}')
+
         except Exception as exc:
+            logger.error(f'Error transforming the FIRDS data in the file {self.firds_csv_path}')
             raise TransformationError('Error transforming the FIRDS data.') from exc
 
         return
